@@ -11,10 +11,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class App {
-
+    // https://jsonplaceholder.typicode.com/posts/1
     public static void main(String[] args) {
         try (CloseableHttpClient httpClient = HttpClientBuilder.create()
             .setDefaultRequestConfig(RequestConfig.custom()
@@ -24,15 +25,25 @@ public class App {
                 .build())
             .build()) {
 
-            HttpGet httpGet = new HttpGet("https://jsonplaceholder.typicode.com/posts/1");
+            HttpGet httpGet = new HttpGet("https://raw.githubusercontent.com/netology-code/jd-homeworks/master/http/task1/cats");
             CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
             HttpEntity entity = httpResponse.getEntity();
+            System.out.println(entity);
 
             if (entity != null) {
                 // return it as a String
                 String result = EntityUtils.toString(entity);
-                JSONObject json = new JSONObject(result);
-                System.out.println(json.toString(2));
+                // JSONObject json = new JSONObject(result);
+                JSONArray jsonArray = new JSONArray(result);
+                JSONArray filteredJsonArray = new JSONArray();
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    if (!jsonObject.isNull("upvotes")) {
+                        filteredJsonArray.put(jsonObject);
+                    }
+                }
+                System.out.println(filteredJsonArray.toString(2));
             }
 
         } catch (IOException e) {
